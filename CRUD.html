@@ -1,42 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>frontend</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <style>
-      body {
-        margin: 10%;
-        justify-content: center;
-      }
-    </style>
-</head>
-<body>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
 
-  <!-- formulario -->
+    input,
+    button,
+    select {
+      margin:5px;
+      padding:6px;
+    }
+  </style>
+</head>
+  <body>
+   
+     <h1>Gerenciamento de Alunos</h1>
+
+    <!--Formulario de cadastro-->
     <div>
       <input type="hidden" id="id">
       <input type="text" id="login" placeholder="login">
       <input type="text" id="nome" placeholder="nome">
       <input type="email" id="email" placeholder="email">
-      <input type="password" id="login" placeholder="senha">
+      <input type="password" id="senha" placeholder="senha">
       <select id="ativo">
         <option value="1">Ativo</option>
-        <option value="0">Inativo</option>
+        <option value="0">inativo</option>
       </select>
-      <button onclick="salvar()">Salvar</button>
+      <button onclick="salvar()">salvar</button>
       <button onclick="limpar()">Cancelar</button>
-     </div>
+    </div>
 
-     <!--campo de pesquisa-->
-     <div>
-      <input type="text" id="pesquisa" placeholder="pesquisar por login ou nome">
+   <!-- Campo de pesquisa -->
+    <div>
+      <input type="text" id="pesquisa" placeholder="Pesquisar por login ou nome">
       <button onclick="carregarPesquisa()">Pesquisar</button>
-      <button onclick="carregar()">Listar todos</button>
-     </div>
-
-    <div class="container mt-5">
+      <button onclick="carregar()">listar todos</button>
+    </div>
 
     <!-- Card com pesquisa -->
     <div class="card shadow">
@@ -44,119 +51,111 @@
         <h5 class="mb-0">Alunos</h5>
       </div>
       <div class="card-body">
-        
-        <!-- Tabela de produtos -->
-        <div class="row">
-          <div class="col-12">
-            <div class="table-responsive">
-              <table class="table table-striped table-hover">
-                <thead class="table-light">
-                  <tr>
-                    <th>ID</th>
-                    <th>Login</th>
-                    <th>Nome</th>
-                    <th>Email </th>
-                    <th>Ativo</th>
-                    <th class="text-center">Ações</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-              <script>
-                //URL da api
-                const API_URL = "https://localhost/api/usuarios.php";
 
-                function carregar(pesquisa = "") {
-                  let url = API_URL;
-                  if(pesquisa) {
-                    url += "?pesquisa" + encodeURIComponent(pesquisa);
-                  }
-                  fetch(url)
-                  .then(resposta => resposta.json())
-                  .then(dados=> {
-                    console.log(dados)
-                    dados.forEach(usuario => {
-                      const tr =document.creatElement("tr");
-                      tr.innerHTML = `
 
-                            <td>${usuario.ID}</td>
-                            <td>${usuario.LOGIN}</td>
-                            <td>${usuario.NOME}</td>
-                            <td>${usuario.EMAIL}</td>
-                            <td>${usuario.ATIVO == 1 ? "sim" : "Não"}</td>
-                            <td>
-                              <button onclick='editar(${JSON.stringify(usuario)})' class="btn btn-light">Editar</button>
-                              <button onclick='excluir(${usuario.ID})' class="btn btn-danger">Excluir</button>
-                              </td>
-                              `;
-                              tbody.appendChild(tr);
-                    });
-                  })
-                  const tbody = document.querySelector("#tabela tbody");
-                  tbody.innerHTML = "";
+    <!--tabela-->
+    <table id="tabela" class="table table-striped table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Login</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Ativo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-                }
-                function carregarPesquisa(){
-                  const valor = document.getElementById("pesquisa").value;
-                  carregar(valor);
+    <script>
 
-                }
-                async function salvar () {
-                  const id = document.getElementById("id").value;
-                  const login = document.getElementById("login").value;
-                  const nome = document.getElementById("nome").value;
-                  const email = document.getElementById("email").value;
-                  const senha = document.getElementById("senha").value;
-                  const ativo = document.getElementById("ativo").value;
+        const API_URL = "http://localhost/api/usuarios.php";
 
-                  const payload = { ID: id, LOGIN: login, NOME: nome, EMAIL: email, SENHA: senha, ATIVO: ativo };
+        function carregar(pesquisa = ""){
+            const tbody = document.querySelector("#tabela tbody");
+            tbody.innerHTML = "";
 
-                  if (id){
-                    await fetch (API_URL, {method: "PUT", body: JSON.stringfy(payload)});
-                  } else {
-                    await fetch(API_URL, {method: "POST", body: JSON.stringfy(payload)})
-                  }
+            let url = API_URL;
+            if (pesquisa) {
+                url += "?pesquisa=" + encodeURIComponent(pesquisa);
+            }
+            fetch(url)
+               .then(resposta => resposta.json())
+               .then(dados => {
+                console.log(dados)
+                dados.forEach(usuario =>{
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                                    <td>${usuario.ID}</td>
+                                    <td>${usuario.LOGIN}</td>
+                                    <td>${usuario.NOME}</td>
+                                    <td>${usuario.EMAIL}</td>
+                                    <td>${usuario.ATIVO == 1 ? "Sim" : "Não"}</td>
+                                    <td>
+                                        <button onclick='editar(${JSON.stringify(usuario)})' class="btn btn-light"> Editar </button>
+                                        <button onclick='excluir(${usuario.ID})' class="btn btn-danger"> excluir </button>
+                                    </td>
+                                    `;
+                    tbody.appendChild(tr);
+                });
+               })
+        }
 
-                  limpar();
-                  carregar(); 
-                }
+        function carregarPesquisa(){
+            const valor = document.getElementById("pesquisa").value;
+            carregar(valor);
+        }
 
-                function editar(usuario) {
-                  document.getElementById("id").value = usuario.ID;
-                  document.getElementById("login").value = usuario.LOGIN;
-                  document.getElementById("nome").value = usuario.NOME;
-                  document.getElementById("email").value = usuario.EMAIL;
-                  document.getElementById("senha").value = usuario.SENHA;
-                  document.getElementById("ativo").value = usuario.ATIVO;
-                }
+        async function salvar() {
+            const id = document.getElementById("id").value;
+            const login = document.getElementById("login").value;
+            const nome = document.getElementById("nome").value;
+            const email = document.getElementById("email").value;
+            const senha = document.getElementById("senha").value;
+            const ativo = document.getElementById("ativo").value;
+            
+            const payload = {ID: id, LOGIN:login, NOME:nome, EMAIL:email, SENHA:senha, ATIVO:ativo};
 
-                async function excluir(id) {
-                  if (confirm("Deseja excluir este usuario?")){
-                    await fetch(API_URL + "?id=" + id, {method: "DELETE"});
-                    carregar();
-                  }
-                }
-                function limpar() {
-                   document.getElementById("id").value = "";
-                  document.getElementById("login").value = "";
-                  document.getElementById("nome").value = "";
-                  document.getElementById("email").value = "";
-                  document.getElementById("senha").value = "";
-                  document.getElementById("ativo").value = "";
-                }
+            if (id){
+                await fetch(API_URL, { method:"PUT", body: JSON.stringify(payload)});
+            } else {
+                await fetch(API_URL, {method:"POST", body: JSON.stringify(payload)});
+            }
+             
+            limpar();
+            carregar();
+        }   
 
-                carregar()
+        function editar(usuario){
+            document.getElementById("id").value = usuario.ID;
+            document.getElementById("login").value = usuario.LOGIN;
+            document.getElementById("nome").value = usuario.NOME;
+            document.getElementById("email").value = usuario.EMAIL;
+            document.getElementById("senha").value = usuario.SENHA;
+            document.getElementById("ativo").value = usuario.ATIVO;
+        }
 
-              </script>
+        async function excluir(id){
+            if (confirm("Tem certeza que quer excluir esse user?")){
+                await fetch(API_URL + "?id=" + id, {method:"DELETE"});
+                carregar();
+            }
+        }
 
-            </div>
-          </div>
-        </div>
+        function limpar(){
+            document.getElementById("id").value =  "";
+            document.getElementById("login").value =  "";
+            document.getElementById("nome").value = "";
+            document.getElementById("email").value =  "";
+            document.getElementById("senha").value =  "";
+            document.getElementById("ativo").value =  "1";
+        }
 
-      </div>
-    </div>
-    
+        carregar();
+
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
-
